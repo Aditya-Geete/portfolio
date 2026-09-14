@@ -1,38 +1,26 @@
 # Portfolio Website — Assignment 3 (Backend Integration)
 
-This extends the Assignment 2 React portfolio with a Node.js/Express backend.
+This extends the Assignment 2 React portfolio with a Node.js backend.
 The frontend's Projects and Contact pages now talk to a real API instead of
 using static local data.
 
-## Project Structure
 
-```
-repo-root/
-├── server/              # Express backend (new)
-│   ├── server.js
-│   ├── routes/
-│   │   ├── projects.js
-│   │   └── contact.js
-│   ├── middleware/
-│   │   └── errorHandler.js
-│   ├── data/
-│   │   ├── projects.js
-│   │   └── contacts.json   (created/updated at runtime)
-│   ├── .env.example
-│   └── package.json
-└── src/                  # React frontend (from Assignment 2, edited)
-    ├── api.js               (new — holds API_BASE_URL)
-    └── components/
-        ├── Projects.jsx      (edited — fetches from API)
-        ├── ProjectDetail.jsx (edited — fetches from API)
-        ├── Contact.jsx       (edited — posts to API)
-        └── ProjectCard.jsx   (edited — techStack field rename)
-```
 
-`src/data/projectsData.js` from Assignment 2 is no longer imported anywhere
-and can be deleted; project data now lives in `server/data/projects.js`.
 
-## Setup & Run
+
+## VIDEO LINK
+## https://drive.google.com/file/d/13Hi3d_CkA6-TLcbIpq3Qs18HwRcaVk5p/view?usp=share_link
+
+
+
+
+
+
+
+
+
+
+## SETUP AND RUN
 
 ### 1. Backend
 
@@ -49,7 +37,6 @@ and prints a confirmation log line.
 ### 2. Frontend
 
 ```bash
-# from the repo root, i.e. your Assignment 2 project folder
 cp frontend-updates/.env.example .env   # sets VITE_API_BASE_URL
 npm install
 npm run dev
@@ -84,6 +71,16 @@ Contact submissions are persisted to a flat JSON file
 satisfies the assignment's "in-memory array or JSON file" allowance without
 requiring a database. Project data is a static in-memory JS array
 (`server/data/projects.js`) since it doesn't need to be mutated at runtime.
+
+
+
+
+
+
+
+
+
+
 
 ## API Endpoints
 
@@ -169,3 +166,50 @@ Lists all stored submissions, for verification during evaluation.
 { "error": "Internal server error" }
 ```
 
+
+
+
+
+
+
+
+
+
+## CURL COMMANDS
+
+
+# B1 — Health Check
+curl -i http://localhost:5000/
+
+# B2 — Get All Projects
+curl -i http://localhost:5000/api/projects
+
+# B3 — Get Single Project (Success & 404)
+curl -i http://localhost:5000/api/projects/xct-analyser
+curl -i http://localhost:5000/api/projects/does-not-exist
+
+# B4 — Submit Contact Form (Success, Missing Field, Invalid Email)
+curl -i -X POST http://localhost:5000/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Jane Doe","email":"jane@example.com","message":"Hi there!"}'
+
+curl -i -X POST http://localhost:5000/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"","email":"jane@example.com","message":"Hi there!"}'
+
+curl -i -X POST http://localhost:5000/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Jane Doe","email":"not-an-email","message":"Hi there!"}'
+
+# B5 — List All Contact Submissions
+curl -i http://localhost:5000/api/contact
+
+# B6 — 404 & Global Error Handling
+curl -i http://localhost:5000/api/doesnotexist
+
+curl -i -X POST http://localhost:5000/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Jane" ,,, broken json'}
+
+# B7 — CORS Verification Header Check
+curl -i -H "Origin: http://localhost:5173" http://localhost:5000/api/projects

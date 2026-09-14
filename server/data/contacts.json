@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": "1789404716877",
+    "name": "Aditya Geete",
+    "email": "adityageete1062004@gmail.com",
+    "message": "hello world!",
+    "submittedAt": "2026-09-14T16:51:56.877Z"
+  },
+  {
+    "id": "1789404751091",
+    "name": "zxv",
+    "email": "adityageete1062004@gmail.com",
+    "message": "xxcv",
+    "submittedAt": "2026-09-14T16:52:31.091Z"
+  },
+  {
+    "id": "1789404882697",
+    "name": "Aditya Geete",
+    "email": "adityageete1062005@gmail.com",
+    "message": "hello",
+    "submittedAt": "2026-09-14T16:54:42.697Z"
+  }
+]
