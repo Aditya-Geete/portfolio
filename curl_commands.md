@@ -1,8 +1,5 @@
 # API Test Commands (curl)
 
-Assumes the backend is running at `http://localhost:5000`. Adjust the port
-if you changed `PORT` in `.env`.
-
 ## B1 — Health check
 
 ```bash

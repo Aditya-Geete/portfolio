@@ -1,69 +1,171 @@
-# Interactive Multi-Page Portfolio Website (React)
+# Portfolio Website — Assignment 3 (Backend Integration)
 
-An interactive, responsive, multi-page personal portfolio application built with **React** and **Vite** for **CS1303: Full Stack Development** (Assignment 2 - NIT Warangal).
+This extends the Assignment 2 React portfolio with a Node.js/Express backend.
+The frontend's Projects and Contact pages now talk to a real API instead of
+using static local data.
 
----
+## Project Structure
 
-## 🚀 Setup & Run Instructions
+```
+repo-root/
+├── server/              # Express backend (new)
+│   ├── server.js
+│   ├── routes/
+│   │   ├── projects.js
+│   │   └── contact.js
+│   ├── middleware/
+│   │   └── errorHandler.js
+│   ├── data/
+│   │   ├── projects.js
+│   │   └── contacts.json   (created/updated at runtime)
+│   ├── .env.example
+│   └── package.json
+└── src/                  # React frontend (from Assignment 2, edited)
+    ├── api.js               (new — holds API_BASE_URL)
+    └── components/
+        ├── Projects.jsx      (edited — fetches from API)
+        ├── ProjectDetail.jsx (edited — fetches from API)
+        ├── Contact.jsx       (edited — posts to API)
+        └── ProjectCard.jsx   (edited — techStack field rename)
+```
 
-Follow these steps to set up and run the project locally on your machine:
+`src/data/projectsData.js` from Assignment 2 is no longer imported anywhere
+and can be deleted; project data now lives in `server/data/projects.js`.
 
-### Prerequisites
-Make sure you have **Node.js** (v18+) installed. You can verify your installation by running:
+## Setup & Run
+
+### 1. Backend
+
 ```bash
-node -v
-npm -v
-
-Installation
-1. Clone the repository or extract the project folder:
-cd portfolio-react-app
-
-1. Install the required dependencies:
+cd server
 npm install
+cp .env.example .env      # adjust PORT / ALLOWED_ORIGIN if needed
+npm run dev                # or: npm start
+```
 
-Execution
-⚬ Development Mode: Run the live preview server with hot-reloading:
+The server starts on `http://localhost:5000` (or whatever `PORT` you set)
+and prints a confirmation log line.
+
+### 2. Frontend
+
+```bash
+# from the repo root, i.e. your Assignment 2 project folder
+cp frontend-updates/.env.example .env   # sets VITE_API_BASE_URL
+npm install
 npm run dev
+```
 
-Open the local URL displayed in the terminal (typically http://localhost:5173).
-⚬ Production Build: Verify that the project builds cleanly without errors:
-npm run build
+The frontend starts on `http://localhost:5173` (Vite default) and now
+fetches project data and submits the contact form to the backend above.
 
-📂 Project Structure & Component Tree
-The project follows a clean modular layout organized under src/:
-src/
-├── assets/            # Static assets (images, logos)
-├── components/        # Reusable UI components
-│   ├── Navbar.jsx     # Navigation bar with Link/NavLink & theme toggle
-│   ├── Footer.jsx     # Shared page footer
-│   ├── ProjectCard.jsx# Reusable card component (receives props & manages local details state)
-│   ├── ProjectDetailCard.jsx # Grandchild component demonstrating prop drilling
-│   ├── Skills.jsx     # Skills showcase component
-│   └── ContactForm.jsx# Controlled form with validation logic
-├── data/              # Mock datasets
-│   └── projects.js    # Array of project objects
-├── pages/             # Page components for routing
-│   ├── Home.jsx       # Landing page (simulates loading delay)
-│   ├── About.jsx      # About page
-│   ├── Projects.jsx   # Projects listing page
-│   ├── ProjectDetail.jsx # Dynamic route page (/projects/:projectId)
-│   └── NotFound.jsx   # 404 Catch-all page
-├── App.jsx            # Top-level component holding Theme state & Router configuration
-└── main.jsx           # Application entry point
+**Two commands to run everything:** `npm run dev` inside `/server`, and
+`npm run dev` at the frontend root, in two terminals.
 
-Component Tree & State-Lifting Decisions
-1. Theme State (App.jsx): ⚬ State Lifted: The theme state ('light' or 'dark') is held in the top-level App component. ⚬ Why: The theme preference affects the entire application layout, including global body styling, the Navbar, and individual child components across all routes. Lifting state to App allows passing the current theme and toggle handler down to the Navbar via props seamlessly.
-2. Prop Drilling Demonstration (2 Levels Deep): ⚬ Projects page (Parent) passes a project data object down to ProjectCard (Child). ⚬ ProjectCard (Child) passes specific fields (e.g., techStack or expanded details) down to ProjectDetailCard (Grandchild).
-3. Isolated Component State: ⚬ ProjectCard.jsx: Holds local state (isExpanded) for its "View Details" toggle button. This ensures expanding details on one card does not affect other cards. ⚬ ContactForm.jsx: Holds local state for controlled input fields (formData) and validation errors (errors).
-⚡ useEffect Hooks Summary
-#	File	Purpose & Explanation	Cleanup Function
-1	App.jsx	Theme Persistence (localStorage): Runs whenever the theme state changes. It synchronizes the theme with localStorage and updates the document.documentElement class so CSS themes apply globally across reloads.	N/A (Synchronous DOM/Storage operation)
-2	Home.jsx	Simulated Mount Loading: Runs once when Home mounts (empty dependency array []). Sets a setTimeout for ~1 second to simulate data fetching before revealing the home page content.	Yes: Clears the timeout (clearTimeout) on component unmount to prevent memory leaks.
-3	Navbar.jsx	Responsive Window Resize Listener: Listens for screen size changes (window.addEventListener('resize', ...)) to automatically adjust/close mobile navigation menus on larger screens.	Yes: Removes the event listener (window.removeEventListener('resize', ...)) on unmount to prevent memory leaks.
-📄 Route Configuration
-⚬ / or /home – Home page featuring a simulated loading state.
-⚬ /about – About section and developer background.
-⚬ /projects – Project gallery rendered from src/data/projects.js.
-⚬ /projects/:projectId – Dynamic project details page using useParams().
-⚬ /contact – Interactive, controlled contact form with live validation.
-⚬ * – 404 Catch-All route directing back to Home.
+## Environment Variables
+
+### `server/.env`
+| Variable | Description | Example |
+|---|---|---|
+| `PORT` | Port the Express server listens on | `5000` |
+| `ALLOWED_ORIGIN` | Origin allowed by CORS (your frontend dev URL) | `http://localhost:5173` |
+| `DATA_FILE` | Path to the JSON file storing contact submissions | `./data/contacts.json` |
+
+### Frontend `.env`
+| Variable | Description | Example |
+|---|---|---|
+| `VITE_API_BASE_URL` | Base URL the frontend calls for the API | `http://localhost:5000` |
+
+No secrets are committed; only `.env.example` files are tracked in git.
+
+## Data Storage Choice
+
+Contact submissions are persisted to a flat JSON file
+(`server/data/contacts.json`), read and rewritten on every request. This
+satisfies the assignment's "in-memory array or JSON file" allowance without
+requiring a database. Project data is a static in-memory JS array
+(`server/data/projects.js`) since it doesn't need to be mutated at runtime.
+
+## API Endpoints
+
+### `GET /`
+Health check.
+```json
+// 200 OK
+{ "status": "ok" }
+```
+
+### `GET /api/projects`
+Returns all projects.
+```json
+// 200 OK
+[
+  {
+    "id": "xct-analyser",
+    "title": "XCT Data Analyser",
+    "tag": "Machine Learning",
+    "description": "...",
+    "fullDetails": "...",
+    "techStack": ["Python", "TensorFlow", "customTkinter"],
+    "image": "/images/xct-analyser.png",
+    "link": "https://github.com/Aditya-Geete/PorosityAnalysis"
+  }
+  // ...
+]
+```
+
+### `GET /api/projects/:id`
+Returns one project by id.
+```json
+// 200 OK
+{ "id": "xct-analyser", "title": "XCT Data Analyser", ... }
+```
+```json
+// 404 Not Found
+{ "error": "Project not found" }
+```
+
+### `POST /api/contact`
+Submits a contact form entry. Body: `{ "name", "email", "message" }`.
+```json
+// 201 Created
+{
+  "message": "Thank you! Your message has been received.",
+  "submission": {
+    "id": "1737000000000",
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "message": "Hi there!",
+    "submittedAt": "2026-09-14T10:00:00.000Z"
+  }
+}
+```
+```json
+// 400 Bad Request (any missing/invalid field)
+{ "error": "Please provide a valid email address." }
+```
+
+### `GET /api/contact`
+Lists all stored submissions, for verification during evaluation.
+
+> ⚠️ **This endpoint is intentionally open with no authentication.**
+> It exists purely so graders/reviewers can confirm that `POST /api/contact`
+> submissions were persisted. In a real deployment this route would need to
+> be protected or removed.
+
+```json
+// 200 OK
+[
+  { "id": "...", "name": "...", "email": "...", "message": "...", "submittedAt": "..." }
+]
+```
+
+### Undefined routes / server errors (B6)
+```json
+// 404 Not Found (any unmatched route)
+{ "error": "Route /api/doesnotexist not found" }
+```
+```json
+// 500 Internal Server Error (unexpected server error)
+{ "error": "Internal server error" }
+```
+
